@@ -1,27 +1,36 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-var botClient = new TelegramBotClient("");
+var botClient = new TelegramBotClient("5724091892:AAElRWyYyUuMsmA-3gpe9cGUdhJhsJb_P3c");
 
 User bot = botClient.GetMeAsync().Result;
+
+List<long> users = new List<long>();
 
 while (true)
 {
     Update[] updates = await botClient.GetUpdatesAsync();
 
     for (int i = 0; i < updates.Length; i++)
+
     {
-        Console.WriteLine(updates[i].Message.Text);
-        Console.WriteLine(updates[i].Message.From.FirstName);
-        Console.WriteLine(updates[i].Message.From.Id); 
+        if (!users.Contains(updates[i].Message.From.Id))
+        {
+            users.Add(updates[i].Message.From.Id);
+        }
+
         ReplyToMessage(updates[i].Message);
         updates = await botClient.GetUpdatesAsync(updates[^1].Id + 1);// Пропускаем обновления, которые уже получили.
-       
+
     }
 
 }
 
 async Task ReplyToMessage(Message message)
 {
-await botClient.SendTextMessageAsync(new ChatId(message.From.Id),"Hello");
+    for (int i = 0; i < users.Count; i++)
+    {
+        await botClient.SendTextMessageAsync(new ChatId(users[i]), message.Text);
+    }
+
 }
